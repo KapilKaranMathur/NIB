@@ -1,0 +1,348 @@
+NBI Experiment PortalImplementation & Experiment Guide
+Based on “Notification Burden Index – Eye Tracking Study Protocol”, Pilot v1.1, 23 September 2026
+Purpose. This document translates the study protocol into a clear portal workflow: what the participant sees, what the researcher controls, the exact default timings, how N/L/H notifications are scheduled, and what data must be stored for eye-tracking synchronization and later analysis.
+Important: The protocol repeatedly labels several durations/counts/windows as pilot settings. The portal should therefore use the protocol values as defaults while allowing researcher-controlled, versioned changes. Every completed session must retain the exact configuration used.
+1. Experiment at a Glance
+Stage
+Default duration
+What happens
+Setup & practice
+10–15 min
+Consent/instructions; tracker calibration/validation; Stroop practice; reading/navigation practice.
+Initial baseline
+5 min
+Neutral screen with central marker; quiet viewing; normal blinking; no notifications.
+Four active blocks
+4 × 5 min
+One Stroop block and three reading blocks (N, L, H) in assigned order.
+Comprehension
+3 × 60 s
+After each reading block, passage hidden and 3 multiple-choice questions shown together.
+Breaks
+3 × 2 min
+Between active blocks; final 30 s uses neutral screen, then drift check.
+State ratings
+~1 min total+
+Mental fatigue before first active block and after every active block; reading-specific ratings after reading blocks.
+Debrief
+1–2 min
+Record difficulties and deviations, then complete/export session.
+
+Counterbalancing. Baseline is always first. Stroop is either before or after the reading module. The three reading blocks remain together and appear in one of the six N/L/H permutations. Passage mapping (P1–P3) and notification-message variant (Q1–Q3) are assigned independently.
+2. Portal Roles
+Participant mode
+Distraction-free, full-screen task interface.
+Shows only instructions and stimuli needed for the current task.
+Never exposes condition codes (N/L/H), task-order cell, passage mapping, notification variant, message IDs/categories, pseudo-events, seeds, analysis windows, or answer keys.
+No correctness feedback in scored Stroop or comprehension phases.
+Researcher/Admin mode
+Create participant/session using participant code; record tracker/calibration metadata, sleep hours, testing time, unusual fatigue and deviations.
+Auto-balance or manually select task-order cell, passage mapping, notification variant and L timing choice.
+Edit protocol defaults through versioned configuration; changes apply to future sessions, not completed sessions.
+Run calibration/drift-check gates, extra breaks/recalibration and controlled abort/skip actions with required reason.
+View/export session logs and quality-control summaries.
+3. Exact Session Flow
+#
+Phase
+Portal behavior
+1
+Setup
+Participant code, sleep/testing metadata, consent-complete checkpoint, instructions, eye-tracker calibration/validation.
+2
+Stroop practice
+16 practice trials; feedback only in practice; repeat once if needed.
+3
+Reading practice
+Two practice panels, navigation practice, practice question, one practice notification.
+4
+Baseline
+300 s neutral screen with central marker; no notification.
+5
+Initial state rating
+Mental fatigue 0–10 immediately before active block 1.
+6
+Active block 1
+According to assigned A/B cell.
+7
+Post-block
+If reading: 60 s comprehension + reading ratings; if Stroop: block-end fatigue rating.
+8
+Break 1
+120 s; final 30 s neutral screen; researcher drift check.
+9
+Active block 2
+Then post-block procedures and Break 2.
+10
+Active block 3
+Then post-block procedures and Break 3.
+11
+Active block 4
+Then post-block procedures; no standard break afterward.
+12
+Debrief
+Record difficulties/deviations, final researcher record, save/export session.
+
+4. Stroop Task
+Scored trial timing (fixed)
+Phase
+Duration
+Behavior
+Fixation “+”
+500 ms
+Central fixation symbol.
+Word + response window
+1,500 ms
+Display Stroop word in ink colour. First D/F/J/K response is scored.
+Blank
+500 ms
+Blank screen; then next trial.
+
+Total: 120 trials × 2.5 s = 300 s. An early response must never shorten the 1,500 ms word display.
+Ink colour
+Response key
+RED
+D
+GREEN
+F
+BLUE
+J
+YELLOW
+K
+
+Target balance: 60 congruent and 60 incongruent trials.
+Use the Appendix A 4×4 count matrix: each diagonal cell 15 times; each off-diagonal cell 5 times.
+Approximately balance CC, CI, IC and II transitions and avoid an identical word+ink pair on consecutive trials.
+Use a new recorded random seed per participant and save the generated order.
+No notifications and no scored feedback during Stroop.
+Stroop data to save
+trial number
+word
+ink colour
+congruency
+previous-trial congruency
+actual stimulus onset
+response key
+reaction time
+correctness
+omission
+invalid/anticipatory key events
+seed/order identifier
+Protocol ambiguity to flag in software: one prose line states “15 incongruent pairs”, but the explicit 4×4 matrix has 12 off-diagonal pairs and sums correctly to 60 incongruent trials. The portal should use the explicit matrix as the default generator, while surfacing this discrepancy to the researcher rather than hiding it.
+5. Reading Task
+Each participant completes three scored reading blocks, 300 s each: N (0 visible notifications), L (3), and H (6).
+Condition
+Visible notifications
+Required logging
+N
+0
+All six matched event times are logged as invisible pseudo-events.
+L
+3
+One event in each 100 s third; uses either earlier or later candidate set.
+H
+6
+Two events in each 100 s third; uses all six candidates.
+
+Reading UI and navigation
+Load exact scored passage content/questions from Appendices D–G; do not paraphrase them.
+One of six panels at a time; no scrolling; show title, text and small panel number only.
+Right Arrow = next panel; Left Arrow = previous panel; no automatic advance.
+Start the 300 s timer when panel 1 appears; stop at exactly 300 s regardless of progress.
+Notification presentation never pauses reading time.
+After all panels are completed, Space records completion once; participant reviews the passage until the 300 s period ends.
+Log every panel change, completion key, last panel reached, completed-panel words and review-period timing.
+Layout item
+Protocol starting value
+Text region
+x=160, y=150, width=960, height=780 on 1920×1080
+Notification region
+x=1320, y=180, width=440, height=160
+Reading typography
+~24 px sans-serif, 1.4 line spacing, constant light background
+
+6. Notification Scheduling for N / L / H
+Block third
+Earlier candidate
+Later candidate
+0–100 s
+45 s
+80 s
+100–200 s
+140 s
+180 s
+200–300 s
+240 s
+275 s
+
+For each participant, draw six independent jitter values from −5 to +5 s, one per candidate.
+Reuse the same six-value jitter vector in all three reading conditions for that participant.
+H uses all six candidates. L uses either the three earlier candidates or the three later candidates, balanced across participants. N logs all six as invisible pseudo-events.
+If a candidate falls within 5 s after a panel change, delay only until the panel has been stable for 5 s; maximum extra delay 5 s. Apply the same rule to pseudo-events.
+Maintain at least 20 s between actual event onsets and at least 10 s of reading after each onset. If constraints fail, mark the event missed; do not compress later events.
+Store scheduled and actual onset/offset. The analysis metadata window begins at −5 s and ends at +10 s around actual onset; flag panel transitions inside the window.
+Banner appearance
+Use exact Appendix C messages. Internal IDs/categories are stored but not shown.
+Header: “Study notification”. Silent visual banner, 3,000 ms default duration, fixed region beside text.
+No animation, vibration, badge, logo, countdown, reply button or click target.
+Use consistent neutral appearance and never cover the text.
+Never show notifications during baseline, Stroop, comprehension or breaks.
+7. Comprehension, Ratings and Breaks
+Comprehension
+After each reading block, hide the passage and show all 3 multiple-choice questions together for 60 s.
+Accept one A/B/C/D response per question; unanswered items are omissions.
+No feedback until the study ends; score 1 point per correct answer.
+Answer keys must remain researcher-only.
+Store responses, timestamps, correctness, omissions, content-display coverage, last panel and progress.
+State ratings
+Mental fatigue item: “How mentally tired do you feel right now?” Use a 0–10 scale from “not at all” to “extremely”, before active block 1 and after each active block.
+After each reading block also collect experienced distraction and difficulty returning to reading. The protocol does not specify their exact scale or anchors, so the portal must make these researcher-configurable rather than silently inventing a scale.
+Breaks
+Three standard breaks of 120 s, between the four active blocks.
+Participant may rest eyes/adjust posture but should not use a phone.
+Final 30 s uses the same neutral screen for readaptation.
+Researcher completes a drift check before the next active block; extra breaks/recalibration are logged.
+8. Counterbalancing and Independent Rotations
+Cell
+Active block 1
+2
+3
+4
+A1
+Stroop
+N
+L
+H
+A2
+Stroop
+N
+H
+L
+A3
+Stroop
+L
+N
+H
+A4
+Stroop
+L
+H
+N
+A5
+Stroop
+H
+N
+L
+A6
+Stroop
+H
+L
+N
+B1
+N
+L
+H
+Stroop
+B2
+N
+H
+L
+Stroop
+B3
+L
+N
+H
+Stroop
+B4
+L
+H
+N
+Stroop
+B5
+H
+N
+L
+Stroop
+B6
+H
+L
+N
+Stroop
+
+Mapping
+N
+L
+H
+P1
+Passage A
+Passage B
+Passage C
+P2
+Passage B
+Passage C
+Passage A
+P3
+Passage C
+Passage A
+Passage B
+
+Notification variants Q1–Q3: implement the exact message allocations in Appendix C, assign approximately equally, and keep independent of P1–P3. Save the final message sequence and random seed.
+9. What Data the Portal Must Store
+Data group
+Minimum fields
+Session/allocation
+participant code, session ID/date, protocol version, task-order cell, passage mapping, notification variant, L timing choice, seeds, jitter vector, actual block order
+Researcher/tracker
+tracker model, sampling frequency, calibration/validation result, sleep hours, testing time, unusual fatigue, extra breaks, recalibration, deviations
+Stroop
+trial number, word, ink, congruency, prior congruency, actual onset, response, RT, correctness, omission, invalid/anticipatory keys
+Reading/navigation
+condition, passage, panel, panel-enter/leave timestamps, direction, completion key/time, review period, last panel, cumulative completed-panel words
+Questions
+passage, question, response, timestamp/RT, correctness, omission, displayed-content flag
+Notification/pseudo-event
+condition, passage, panel, message ID/category, visible/pseudo, base candidate, jitter, scheduled/actual onset+offset, delay, presentation success, missed reason, panel transitions, completion/review status
+Ratings
+mental fatigue plus reading-specific distraction/return ratings with scale metadata
+Generic event log
+event type, performance.now()-based monotonic time, UTC time, payload JSON
+
+Eye-tracking synchronization. The portal should create accurate task/event timestamps and AOI metadata for later merging with Tobii data. It should not claim to calculate gaze measures unless raw gaze samples are actually imported or integrated. Gaze validity/pupil fields may remain nullable until synchronization.
+10. Recommended Exports
+session_summary.csv
+stroop_trials.csv
+reading_panel_events.csv
+comprehension_responses.csv
+notification_events.csv (real + pseudo)
+ratings.csv
+breaks_and_calibration.csv
+event_log.csv
+full_session.json
+11. Portal Fidelity / QA Checklist
+Stroop = exactly 120 scored trials and 300 s by default; each trial 500/1500/500 ms.
+Early Stroop response never shortens display; no scored feedback.
+Reading = exactly 300 s and questions = 60 s by default.
+N: 0 visible banners + 6 pseudo-events; L: 3 visible; H: 6 visible.
+Same jitter vector reused across N/L/H for the participant.
+Notification default duration = 3,000 ms; text is never obscured.
+No notifications outside reading blocks.
+Three reading blocks remain together; assigned N/L/H order and passage mapping are preserved.
+Three 2-min breaks only between active blocks; final 30 s neutral screen; drift check before next block.
+All seeds, generated orders, actual timestamps and protocol-version snapshot are saved.
+Participant mode hides all internal research codes and answer keys.
+12. Researcher: How to Run One Participant
+Create a new session and enter participant code, tracker details, previous-night sleep, testing time and unusual-fatigue notes.
+Confirm/auto-generate task-order cell, passage mapping, notification variant, L timing choice and seeds. Do not tell participant the internal allocation.
+Complete consent/instructions outside or inside the approved portal workflow; calibrate and validate the eye tracker; mark the checkpoint complete.
+Run Stroop practice and reading practice. Resolve any practice misunderstanding before baseline.
+Start 5-minute baseline. Then collect the initial mental-fatigue rating immediately before active block 1.
+Run the four active blocks exactly in assigned order. After each reading: 60-second comprehension, then reading-specific ratings. After every active block: mental-fatigue rating.
+Between active blocks run the 2-minute break; final 30 seconds neutral screen; perform drift check and recalibrate if necessary.
+After the last block, debrief and record any deviations, missed notifications, extra breaks or recalibration.
+Complete the session record, verify data completeness, and export synchronized task logs for later eye-tracking merge/analysis.
+13. Implementation Notes That Protect the Experiment
+Use a client-side state machine and monotonic timing; save actual rendered onsets/offsets rather than trusting scheduled timers.
+Autosave during the session and recover only with researcher confirmation after accidental refresh/crash.
+Prevent key-repeat from generating multiple panel moves/responses; log invalid keys.
+Add a clearly separated accelerated simulation/test mode. Test data must never be mixed with real sessions.
+Keep content in configuration/seed files, not hard-coded across UI components, so pilot revisions are controlled and traceable.
+Run automated validators for Stroop matrix totals, event counts, notification spacing, task allocation and missing fields before allowing a scored session to be marked complete.
